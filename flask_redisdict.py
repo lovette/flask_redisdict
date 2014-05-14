@@ -36,10 +36,10 @@ class RedisDict(object, DictMixin):
     def __getitem__(self, name):
         """Return the value of hash field ``name``, raises a KeyError if the field doesn't exist."""
         self._check_state()
-        value = self._loads(self.redis.hget(self.key, name))
-        if value:
-            return value
-        raise KeyError(name)
+        value = self.redis.hget(self.key, name)
+        if value is None:
+            raise KeyError(name)
+        return self._loads(value)
 
     def __setitem__(self, name, value):
         """Sets hash field ``name`` to ``value``."""
