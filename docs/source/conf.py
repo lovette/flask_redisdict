@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # Flask-RedisDict documentation build configuration file, created by
 # sphinx-quickstart on Thu Mar 20 20:22:31 2014.
 #
