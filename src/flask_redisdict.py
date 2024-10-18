@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from flask.sessions import TaggedJSONSerializer
 from UserDict import DictMixin
 from uuid import uuid4
