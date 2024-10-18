@@ -1,0 +1,62 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "flask_redisdict"
+version = "1.0.0"
+description = "Flask extension that allows access to Redis hash as a dictionary."
+readme = "README.md"
+license = {file = "LICENSE"}
+authors = [{name = "Lance Lovette", email = "lance.lovette@gmail.com"}]
+keywords = ["python", "flask", "redis"]
+
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: Web Environment",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: BSD License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+  "Topic :: Software Development :: Libraries :: Python Modules"
+]
+
+requires-python = ">=3.9"
+
+dependencies = [
+  "flask",
+  "redis",
+]
+
+[project.urls]
+Source = "https://github.com/lovette/flask_redisdict"
+Repository = "https://github.com/lovette/flask_redisdict.git"
+
+[project.optional-dependencies]
+dev = [
+  "ruff",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+exclude = ["docs*"]
+
+# https://docs.astral.sh/ruff/configuration/
+[tool.ruff]
+line-length = 150
+target-version = "py39"
+
+# https://docs.astral.sh/ruff/rules/
+[tool.ruff.lint]
+select = [
+  "ALL",
+]
+
+ignore = [
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
