@@ -64,7 +64,7 @@ class RedisDict(MutableMapping):
 
     def __repr__(self):
         """Return representation of instance."""
-        return "%s(key='%s', max_age=%d)" % (self.__class__.__name__, self.key, self.max_age)
+        return f"{self.__class__.__name__}(key='{self.key}', max_age={self.max_age})"
 
     def __iter__(self):
         yield from self.keys()
@@ -145,7 +145,7 @@ class RedisDict(MutableMapping):
     def _check_state(self):
         """Asserts internal state is safe to access."""
         if self.redis is None:
-            raise AttributeError('<%r> has no redis instance' % self)
+            raise AttributeError(f'<{self!r}> has no redis instance')
         assert isinstance(self.redis, redis.StrictRedis)
         if self.key is None:
             self.key = self._create_hash()
