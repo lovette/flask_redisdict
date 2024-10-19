@@ -1,10 +1,10 @@
 from flask.sessions import TaggedJSONSerializer
-from UserDict import DictMixin
+from collections.abc import MutableMapping
 from uuid import uuid4
 import redis
 
 
-class RedisDict(object, DictMixin):
+class RedisDict(MutableMapping):
     """Acts like a dictionary but reflects item access to Redis.
 
     Attributes:
@@ -65,6 +65,9 @@ class RedisDict(object, DictMixin):
     def __repr__(self):
         """Return representation of instance."""
         return "%s(key='%s', max_age=%d)" % (self.__class__.__name__, self.key, self.max_age)
+
+    def __iter__(self):
+        yield from self.keys()
 
     def has_key(self, name):
         """Returns a boolean indicating whether hash field ``name`` exists."""
