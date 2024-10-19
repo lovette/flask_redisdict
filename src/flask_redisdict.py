@@ -1,7 +1,8 @@
-from flask.sessions import TaggedJSONSerializer
 from collections.abc import MutableMapping
 from uuid import uuid4
+
 import redis
+from flask.sessions import TaggedJSONSerializer
 
 
 class RedisDict(MutableMapping):
