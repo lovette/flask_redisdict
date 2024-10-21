@@ -1,0 +1,50 @@
+name: Pytest
+
+on:
+  # Allow triggering manually from GitHub UI.
+  workflow_dispatch:
+
+  push:
+    # Run workflow if commit is tagged with a semantic version number.
+    # Applies to all branches.
+    tags:
+      - "v[0-9]+"
+      - "v[0-9]+.[0-9]+"
+      - "v[0-9]+.[0-9]+.[0-9]+"
+      - "v[0-9]+.[0-9]+.[0-9]+-*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Display Python version
+        run: python -c "import sys; print(sys.version)"
+
+      - name: Create virtualenv
+        run: make virtualenv
+
+      - name: Generate requirements.txt
+        run: |
+          source "$HOME"/.virtualenvs/flask_redisdict/bin/activate
+          make requirements
+
+      - name: Install requirements
+        run: |
+          source "$HOME"/.virtualenvs/flask_redisdict/bin/activate
+          make install-dev
+
+      - name: Run tests
+        run: |
+          source "$HOME"/.virtualenvs/flask_redisdict/bin/activate
+          pytest --cache-clear
