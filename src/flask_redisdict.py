@@ -155,9 +155,11 @@ class RedisDict(MutableMapping):
     def _check_state(self) -> None:
         """Asserts internal state is safe to access."""
         if self.redis is None:
-            raise ValueError(f"<{self!r}> has no redis instance")
+            errmsg = f"<{self!r}> has no redis instance"
+            raise ValueError(errmsg)
         if not isinstance(self.redis, redis.Redis):
-            raise TypeError(f"<{self!r}> redis instance is type <{self.redis.__class__.__name__}> expected type <Redis>")
+            errmsg = f"<{self!r}> redis instance is type <{self.redis.__class__.__name__}> expected type <Redis>"
+            raise TypeError(errmsg)
 
     def _generate_key(self) -> str:
         """Generate a hash key."""
