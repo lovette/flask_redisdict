@@ -70,6 +70,9 @@ class RedisDict(MutableMapping):
     def __iter__(self):
         yield from self.keys()
 
+    def __contains__(self, key):
+        return self.has_key(key)
+
     def has_key(self, name):
         """Returns a boolean indicating whether hash field ``name`` exists."""
         self._check_state()
