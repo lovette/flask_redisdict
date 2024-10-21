@@ -57,20 +57,8 @@ select = [
   "ALL",
 ]
 
-# ignore = [
-#   "D100",   # https://docs.astral.sh/ruff/rules/undocumented-public-module/
-#   "D205",   # https://docs.astral.sh/ruff/rules/blank-line-after-summary/
-#   "TRY003", # https://docs.astral.sh/ruff/rules/raise-vanilla-args/
-#   "EM102",  # https://docs.astral.sh/ruff/rules/f-string-in-exception/
-#   "EM101",  # https://docs.astral.sh/ruff/rules/raw-string-in-exception/
-#   "S101",   # https://docs.astral.sh/ruff/rules/assert/
-#   "G004",   # https://docs.astral.sh/ruff/rules/logging-f-string/
-#   "FBT001", # https://docs.astral.sh/ruff/rules/boolean-type-hint-positional-argument/
-#   "FBT002", # https://docs.astral.sh/ruff/rules/boolean-default-value-positional-argument/
-#   "ANN002", # https://docs.astral.sh/ruff/rules/missing-type-args/
-#   "ANN003", # https://docs.astral.sh/ruff/rules/missing-type-kwargs/
-#   "COM812", # https://docs.astral.sh/ruff/rules/missing-trailing-comma/
-# ]
+ignore = [
+]
 
 [tool.ruff.lint.extend-per-file-ignores]
 "tests/**/*.py" = [
