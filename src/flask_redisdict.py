@@ -9,7 +9,7 @@ class RedisDict(MutableMapping):
     """Acts like a dictionary but reflects item access to Redis.
 
     Attributes:
-        redis (redis.StrictRedis): Redis instance.
+        redis (redis.Redis): Redis instance.
         key (string): Hash key.
         max_age (int): Hash key TTL in seconds, None if key does not expire.
 
@@ -24,7 +24,7 @@ class RedisDict(MutableMapping):
         """Constructor
 
         Arguments:
-            redis_instance (StrictRedis): Redis instance.
+            redis_instance (Redis): Redis instance.
             key (string): Dict hash key.
             max_age (int): TTL of dict hash, in seconds. None if key does not expire.
         """
