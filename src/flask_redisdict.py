@@ -159,10 +159,6 @@ class RedisDict(MutableMapping):
         if not isinstance(self.redis, redis.Redis):
             raise TypeError(f"<{self!r}> redis instance is type <{self.redis.__class__.__name__}> expected type <Redis>")
 
-    def _create_hash(self):
-        """Generate a new hash key and create the hash."""
-        return self._generate_key()
-
     def _generate_key(self) -> str:
         """Generate a hash key."""
         return str(uuid4())
