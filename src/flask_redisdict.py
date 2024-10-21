@@ -177,6 +177,5 @@ class RedisDict(MutableMapping):
 
     def _hset(self, p: redis.Pipeline, field: str, value: str | int | dict | Sequence, key: str | None = None) -> None:
         """Helper function to serialize hset values."""
-        assert p is not None
         key = key or self.key
         p.hset(key, field, self._dumps(value))
