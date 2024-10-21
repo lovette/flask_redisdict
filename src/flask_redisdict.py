@@ -29,7 +29,7 @@ class RedisDict(MutableMapping):
             max_age (int): TTL of dict hash, in seconds. None if key does not expire.
         """
         self.redis = redis_instance
-        self.key = key
+        self.key = key if key else self._generate_key()
         self.max_age = max_age
 
     def __getitem__(self, name):
@@ -91,11 +91,10 @@ class RedisDict(MutableMapping):
         return [(k, self._loads(v)) for k, v in self.redis.hgetall(self.key).items()]
 
     def delete(self):
-        """Deletes entire hash and resets key."""
-        if self.key is not None:
+        """Deletes entire hash."""
+        if self.key:
             self._check_state()
             self.redis.delete(self.key)
-            self.key = None
 
     def update(self, other=None, **kwargs):
         """Efficient way to set multiple hash fields."""
@@ -136,20 +135,13 @@ class RedisDict(MutableMapping):
 
     def exists(self):
         """Returns True if hash key exists."""
-        if self.key is None:
-            return False
-        if self.redis.exists(self.key):
-            return True
-        self.key = None  # hash is invalid and should be recreated
-        return False
+        return self.key and self.redis.exists(self.key)
 
     def _check_state(self):
         """Asserts internal state is safe to access."""
         if self.redis is None:
             raise AttributeError(f'<{self!r}> has no redis instance')
         assert isinstance(self.redis, redis.StrictRedis)
-        if self.key is None:
-            self.key = self._create_hash()
 
     def _create_hash(self):
         """Generate a new hash key and create the hash."""
