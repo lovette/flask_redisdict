@@ -1,3 +1,9 @@
+"""Flask extension that allows access to Redis hash as a dictionary.
+
+This module provides:
+- RedisDict
+"""
+
 from collections.abc import MutableMapping
 from uuid import uuid4
 
