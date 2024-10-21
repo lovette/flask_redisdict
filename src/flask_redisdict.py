@@ -106,11 +106,11 @@ class RedisDict(MutableMapping):
         if other is not None:
             self._check_state()
             p = self.redis.pipeline()
-            if hasattr(other, 'iteritems'):
-                for k, v in other.iteritems():
+            if hasattr(other, "items"):
+                for k, v in other.items():
                     self._hset(p, k, v)
-            elif hasattr(other, 'keys'):
-                for k in other.keys():
+            elif hasattr(other, "keys"):
+                for k in other:
                     self._hset(p, k, other[k])
             else:
                 for k, v in other:
