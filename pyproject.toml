@@ -7,8 +7,8 @@ name = "flask_redisdict"
 version = "1.5.0"
 description = "Flask extension that allows access to Redis hash as a dictionary."
 readme = "README.md"
-license = {file = "LICENSE"}
-authors = [{name = "Lance Lovette", email = "lance.lovette@gmail.com"}]
+license = { file = "LICENSE" }
+authors = [{ name = "Lance Lovette", email = "lance.lovette@gmail.com" }]
 keywords = ["python", "flask", "redis"]
 
 classifiers = [
@@ -21,15 +21,12 @@ classifiers = [
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",
   "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
-  "Topic :: Software Development :: Libraries :: Python Modules"
+  "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
 requires-python = ">=3.9"
 
-dependencies = [
-  "flask",
-  "redis",
-]
+dependencies = ["flask", "redis"]
 
 [project.urls]
 Source = "https://github.com/lovette/flask_redisdict"
@@ -37,10 +34,6 @@ Repository = "https://github.com/lovette/flask_redisdict.git"
 
 [project.optional-dependencies]
 dev = ["fakeredis", "pyright", "pytest", "ruff", "types-redis"]
-  "pytest",
-  "fakeredis",
-  "ruff",
-]
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -53,9 +46,7 @@ target-version = "py39"
 
 # https://docs.astral.sh/ruff/rules/
 [tool.ruff.lint]
-select = [
-  "ALL",
-]
+select = ["ALL"]
 
 ignore = [
   "ANN002", # https://docs.astral.sh/ruff/rules/missing-type-args/
@@ -67,11 +58,11 @@ ignore = [
 [tool.ruff.lint.extend-per-file-ignores]
 "tests/**/*.py" = [
   # https://github.com/astral-sh/ruff/issues/4368
-  "ARG", # Unused function args -> fixtures nevertheless are functionally relevant...
-  "D103", # undocumented-public-function
-  "FBT", # Don't care about booleans as positional arguments in tests, e.g. via @pytest.mark.parametrize()
+  "ARG",     # Unused function args -> fixtures nevertheless are functionally relevant...
+  "D103",    # undocumented-public-function
+  "FBT",     # Don't care about booleans as positional arguments in tests, e.g. via @pytest.mark.parametrize()
   "PLR2004", # magic-value-comparison
-  "S101", # asserts allowed in tests...
+  "S101",    # asserts allowed in tests...
 ]
 
 [tool.ruff.lint.pydocstyle]
