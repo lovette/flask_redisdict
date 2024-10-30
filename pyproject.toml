@@ -36,7 +36,7 @@ Source = "https://github.com/lovette/flask_redisdict"
 Repository = "https://github.com/lovette/flask_redisdict.git"
 
 [project.optional-dependencies]
-dev = [
+dev = ["fakeredis", "pyright", "pytest", "ruff", "types-redis"]
   "pytest",
   "fakeredis",
   "ruff",
@@ -80,3 +80,9 @@ convention = "google"
 [tool.pytest.ini_options]
 addopts = ["--import-mode=importlib"]
 pythonpath = "src"
+
+# https://github.com/microsoft/pyright/blob/main/docs/configuration.md#sample-pyprojecttoml-file
+[tool.pyright]
+include = ["src", "tests"]
+typeCheckingMode = "standard"
+pythonVersion = "3.9"

@@ -108,6 +108,10 @@ distclean:  ## Delete build files, python cache and package build artifacts
 ############################
 ##@ Test
 
+.PHONY: pyright
+pyright:  ## Run static type checks
+	pyright
+
 .PHONY: tests
 tests:  ## Run unit tests
 	pytest
