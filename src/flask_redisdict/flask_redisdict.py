@@ -10,11 +10,21 @@ from collections.abc import Iterator, MutableMapping, Sequence
 from typing import TYPE_CHECKING
 from uuid import uuid4
 
-import redis
 from flask.sessions import TaggedJSONSerializer
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
+    import redis
+
+
+
+
+class RedisDictNoRedisError(ValueError):
+    """Exception for RedisDict not having a Redis instance."""
+
+    def __init__(self, *args: object) -> None:
+        """Constructor."""
+        super().__init__("<{self!r}> has no redis instance.", *args)
 
 
 class RedisDict(MutableMapping):
@@ -42,6 +52,14 @@ class RedisDict(MutableMapping):
         self.key = key if key else self._generate_key()
         self.max_age = max_age
 
+        if self.redis is not None:
+            # Sanity check we have a Redis instance
+            try:
+                self.redis.pipeline()
+            except AttributeError:
+                errmsg = f"<{self!r}> redis instance is type <{self.redis.__class__.__name__}> expected type <Redis>"
+                raise TypeError(errmsg) from None
+
     def __getitem__(self, name: str) -> str | int | dict | Sequence:
         """Return the value of field ``name``.
 
@@ -54,10 +72,15 @@ class RedisDict(MutableMapping):
         Returns:
             str | int | dict | Sequence
         """
+        if self.redis is None:
+            raise RedisDictNoRedisError
+
         self._check_state()
+
         value = self.redis.hget(self.key, name)
         if value is None:
             raise KeyError(name)
+
         return self._loads(value)
 
     def __setitem__(self, name: str, value: str | int | dict | Sequence) -> None:
@@ -69,7 +92,11 @@ class RedisDict(MutableMapping):
             name (str): Field name.
             value (str | int | dict | Sequence): Field value.
         """
+        if self.redis is None:
+            raise RedisDictNoRedisError
+
         self._check_state()
+
         p = self.redis.pipeline()
         self._hset(p, name, value)
         if self.max_age is not None:
@@ -84,7 +111,11 @@ class RedisDict(MutableMapping):
         Args:
             name (str): Field name.
         """
+        if self.redis is None:
+            raise RedisDictNoRedisError
+
         self._check_state()
+
         p = self.redis.pipeline()
         p.hdel(self.key, name)
         if self.max_age is not None:
@@ -97,7 +128,11 @@ class RedisDict(MutableMapping):
         Returns:
             int
         """
+        if self.redis is None:
+            raise RedisDictNoRedisError
+
         self._check_state()
+
         return self.redis.hlen(self.key)
 
     def __repr__(self) -> str:
@@ -136,7 +171,11 @@ class RedisDict(MutableMapping):
         Returns:
             bool
         """
+        if self.redis is None:
+            raise RedisDictNoRedisError
+
         self._check_state()
+
         return self.redis.hexists(self.key, name)
 
     def keys(self) -> list[str]:
@@ -145,7 +184,11 @@ class RedisDict(MutableMapping):
         Returns:
             list[str]
         """
+        if self.redis is None:
+            raise RedisDictNoRedisError
+
         self._check_state()
+
         return self.redis.hkeys(self.key)
 
     def values(self) -> list[str | int | dict | Sequence]:
@@ -154,7 +197,11 @@ class RedisDict(MutableMapping):
         Returns:
             list[str | int | dict | Sequence]
         """
+        if self.redis is None:
+            raise RedisDictNoRedisError
+
         self._check_state()
+
         return [self._loads(v) for v in self.redis.hvals(self.key)]
 
     def items(self) -> list[tuple[str, str | int | dict | Sequence]]:
@@ -163,11 +210,18 @@ class RedisDict(MutableMapping):
         Returns:
             list[tuple[str, str | int | dict | Sequence]]
         """
+        if self.redis is None:
+            raise RedisDictNoRedisError
+
         self._check_state()
+
         return [(k, self._loads(v)) for k, v in self.redis.hgetall(self.key).items()]
 
     def delete(self) -> None:
         """Delete entire hash."""
+        if self.redis is None:
+            raise RedisDictNoRedisError
+
         if self.key:
             self._check_state()
             self.redis.delete(self.key)
@@ -181,6 +235,9 @@ class RedisDict(MutableMapping):
             other (dict | Mapping | list[tuple[str, str  |  int  |  dict  |  Sequence]] | None, optional): Dictionary, mapping or sequence of tuples.
             kwargs (dict): Key/value pairs as arguments.
         """
+        if self.redis is None:
+            raise RedisDictNoRedisError
+
         # Same logic as UserDict.update
         if other is not None:
             self._check_state()
@@ -213,7 +270,11 @@ class RedisDict(MutableMapping):
         Returns:
             redis.Pipeline if delayed, otherwise None.
         """
+        if self.redis is None:
+            raise RedisDictNoRedisError
+
         self._check_state()
+
         if fields:
             p = self.redis.pipeline()
             for name in fields:
@@ -223,6 +284,7 @@ class RedisDict(MutableMapping):
             if delay_execute is True:
                 return p
             p.execute()
+
         return None
 
     def exists(self) -> bool:
@@ -231,6 +293,9 @@ class RedisDict(MutableMapping):
         Returns:
             bool
         """
+        if self.redis is None:
+            raise RedisDictNoRedisError
+
         return self.key and self.redis.exists(self.key)
 
     def _check_state(self) -> None:
@@ -240,12 +305,6 @@ class RedisDict(MutableMapping):
             ValueError: Redis instance has not been set.
             TypeError: Redis instance is not of type `Redis`.
         """
-        if self.redis is None:
-            errmsg = f"<{self!r}> has no redis instance"
-            raise ValueError(errmsg)
-        if not isinstance(self.redis, redis.Redis):
-            errmsg = f"<{self!r}> redis instance is type <{self.redis.__class__.__name__}> expected type <Redis>"
-            raise TypeError(errmsg)
 
     def _generate_key(self) -> str:
         """Generate a hash key."""

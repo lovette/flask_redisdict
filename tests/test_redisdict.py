@@ -22,9 +22,8 @@ def test_redis_instance_none(redis_client: FakeRedis) -> None:
 
 
 def test_redis_instance_not_redis(redis_client: FakeRedis) -> None:
-    redis_dict = RedisDict(object())
     with pytest.raises(TypeError, match="expected type <Redis>"):
-        redis_dict["A"] = "ValueA"
+        RedisDict(object())  # pyright: ignore[reportArgumentType]
 
 
 def test_not_exists(redis_client: FakeRedis) -> None:
