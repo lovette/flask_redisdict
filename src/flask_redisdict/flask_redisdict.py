@@ -312,7 +312,7 @@ class RedisDict(MutableMapping):
         """Serialize ``value``."""
         if self.serializer is not None:
             return self.serializer.dumps(value)
-        return value
+        return str(value)
 
     def _loads(self, value: str) -> RedisDictValuesT:
         """Unserialize ``value``."""
