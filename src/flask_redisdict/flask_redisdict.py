@@ -1,3 +1,4 @@
+# pyright: reportIncompatibleMethodOverride=false
 """Flask extension that allows access to Redis hash as a dictionary.
 
 This module provides:
@@ -6,17 +7,18 @@ This module provides:
 
 from __future__ import annotations
 
-from collections.abc import Iterator, MutableMapping, Sequence
-from typing import TYPE_CHECKING
+from collections.abc import Collection, Iterator, Mapping, MutableMapping, Sequence
+from typing import TYPE_CHECKING, Union
 from uuid import uuid4
 
 from flask.sessions import TaggedJSONSerializer
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping
     import redis
 
 
+_RedisDictScalarValuesT = Union[str, int, bool]
+RedisDictValuesT = Union[_RedisDictScalarValuesT, Collection[_RedisDictScalarValuesT]]
 
 
 class RedisDictNoRedisError(ValueError):
@@ -60,7 +62,7 @@ class RedisDict(MutableMapping):
                 errmsg = f"<{self!r}> redis instance is type <{self.redis.__class__.__name__}> expected type <Redis>"
                 raise TypeError(errmsg) from None
 
-    def __getitem__(self, name: str) -> str | int | dict | Sequence:
+    def __getitem__(self, name: str) -> RedisDictValuesT:
         """Return the value of field ``name``.
 
         Args:
@@ -70,7 +72,7 @@ class RedisDict(MutableMapping):
             KeyError: Field does not exist.
 
         Returns:
-            str | int | dict | Sequence
+            RedisDictValuesT
         """
         if self.redis is None:
             raise RedisDictNoRedisError
@@ -83,14 +85,14 @@ class RedisDict(MutableMapping):
 
         return self._loads(value)
 
-    def __setitem__(self, name: str, value: str | int | dict | Sequence) -> None:
+    def __setitem__(self, name: str, value: RedisDictValuesT) -> None:
         """Set field ``name`` to ``value``.
 
         Resets hash key TTL to `max_age`.
 
         Args:
             name (str): Field name.
-            value (str | int | dict | Sequence): Field value.
+            value (RedisDictValuesT): Field value.
         """
         if self.redis is None:
             raise RedisDictNoRedisError
@@ -191,11 +193,11 @@ class RedisDict(MutableMapping):
 
         return self.redis.hkeys(self.key)
 
-    def values(self) -> list[str | int | dict | Sequence]:
+    def values(self) -> list[RedisDictValuesT]:
         """Return field values.
 
         Returns:
-            list[str | int | dict | Sequence]
+            list[RedisDictValuesT]
         """
         if self.redis is None:
             raise RedisDictNoRedisError
@@ -204,11 +206,11 @@ class RedisDict(MutableMapping):
 
         return [self._loads(v) for v in self.redis.hvals(self.key)]
 
-    def items(self) -> list[tuple[str, str | int | dict | Sequence]]:
+    def items(self) -> list[tuple[str, RedisDictValuesT]]:
         """Return tuple (key, value) for all fields.
 
         Returns:
-            list[tuple[str, str | int | dict | Sequence]]
+            list[tuple[str, RedisDictValuesT]]
         """
         if self.redis is None:
             raise RedisDictNoRedisError
@@ -226,13 +228,13 @@ class RedisDict(MutableMapping):
             self._check_state()
             self.redis.delete(self.key)
 
-    def update(self, other: dict | Mapping | list[tuple[str, str | int | dict | Sequence]] | None = None, **kwargs) -> None:
+    def update(self, other: Mapping[str, RedisDictValuesT] | Sequence[tuple[str, RedisDictValuesT]] | None = None, **kwargs) -> None:
         """Set values for multiple fields efficiently.
 
         Resets hash key TTL to `max_age`.
 
         Args:
-            other (dict | Mapping | list[tuple[str, str  |  int  |  dict  |  Sequence]] | None, optional): Dictionary, mapping or sequence of tuples.
+            other (Mapping | Sequence[tuple[str, RedisDictValuesT]] | None, optional): Mapping or sequence of tuples.
             kwargs (dict): Key/value pairs as arguments.
         """
         if self.redis is None:
@@ -258,13 +260,13 @@ class RedisDict(MutableMapping):
         if kwargs:
             self.update(kwargs)
 
-    def del_keys(self, fields: Sequence[str], delay_execute: bool = False) -> redis.Pipeline | None:
+    def del_keys(self, fields: Collection[str], delay_execute: bool = False) -> redis.Pipeline | None:  # pyright:ignore[reportAttributeAccessIssue]
         """Delete multiple fields efficiently.
 
         Resets hash key TTL to `max_age`.
 
         Args:
-            fields (Sequence[str]): Sequence of field names.
+            fields (Collection[str]): Collection of field names.
             delay_execute (bool, optional): True to delay pipeline execution. Defaults to False.
 
         Returns:
@@ -310,19 +312,19 @@ class RedisDict(MutableMapping):
         """Generate a hash key."""
         return str(uuid4())
 
-    def _dumps(self, value: str | int | dict | Sequence) -> str:
+    def _dumps(self, value: RedisDictValuesT) -> str:
         """Serialize ``value``."""
         if self.serializer is not None:
             return self.serializer.dumps(value)
         return value
 
-    def _loads(self, value: str) -> str | int | dict | Sequence:
+    def _loads(self, value: str) -> RedisDictValuesT:
         """Unserialize ``value``."""
         if value is not None and self.serializer is not None:
             return self.serializer.loads(value)
         return value
 
-    def _hset(self, p: redis.Pipeline, field: str, value: str | int | dict | Sequence, key: str | None = None) -> None:
+    def _hset(self, p: redis.Pipeline, field: str, value: RedisDictValuesT, key: str | None = None) -> None:  # pyright:ignore[reportAttributeAccessIssue]
         """Helper function to serialize hset values."""
         key = key or self.key
         p.hset(key, field, self._dumps(value))
