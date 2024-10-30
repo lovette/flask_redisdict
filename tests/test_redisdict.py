@@ -204,7 +204,7 @@ def test_keyerror_get(redis_client: FakeRedis) -> None:
     assert len(redis_dict) == 1
 
     with pytest.raises(KeyError, match="B"):
-        redis_dict["B"] == "ValueB" or True
+        assert redis_dict["B"] == "ValueB"
 
 
 def test_keyerror_del(redis_client: FakeRedis) -> None:
