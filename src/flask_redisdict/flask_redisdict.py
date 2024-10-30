@@ -240,16 +240,12 @@ class RedisDict(MutableMapping):
         if self.redis is None:
             raise RedisDictNoRedisError
 
-        # Same logic as UserDict.update
         if other is not None:
             self._check_state()
             p = self.redis.pipeline()
-            if hasattr(other, "items"):
+            if isinstance(other, Mapping):
                 for k, v in other.items():
                     self._hset(p, k, v)
-            elif hasattr(other, "keys"):
-                for k in other:
-                    self._hset(p, k, other[k])
             else:
                 for k, v in other:
                     self._hset(p, k, v)
