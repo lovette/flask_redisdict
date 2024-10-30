@@ -294,7 +294,7 @@ class RedisDict(MutableMapping):
         if self.redis is None:
             raise RedisDictNoRedisError
 
-        return self.key and self.redis.exists(self.key)
+        return bool(self.key) and bool(self.redis.exists(self.key))
 
     def _check_state(self) -> None:
         """Asserts internal state is safe to access.
