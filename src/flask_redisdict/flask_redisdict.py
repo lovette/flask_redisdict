@@ -11,7 +11,7 @@ from collections.abc import Collection, Iterator, Mapping, MutableMapping, Seque
 from typing import TYPE_CHECKING, Union
 from uuid import uuid4
 
-from flask.sessions import TaggedJSONSerializer
+from flask.json.tag import TaggedJSONSerializer
 
 if TYPE_CHECKING:
     import redis
